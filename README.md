@@ -1,3 +1,6 @@
+[![CI](https://github.com/nuclio/gosecretive/actions/workflows/ci.yaml/badge.svg?branch=main&event=push)](https://github.com/nuclio/gosecretive/actions/workflows/ci.yaml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/nuclio/gosecretive.svg)](https://pkg.go.dev/github.com/nuclio/gosecretive)
+
 # gosecretive
 
 `gosecretive` is a library for scrubbing sensitive _string_ data from `go` objects,
