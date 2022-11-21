@@ -300,6 +300,28 @@ func TestRoundTrip(t *testing.T) {
 	}
 }
 
+func TestSkipUnxportedFields(t *testing.T) {
+	t.Run("SkipUnexportedFields", func(t *testing.T) {
+		type structWithUnexported struct {
+			Exported   string
+			unexported string
+		}
+		s := structWithUnexported{
+			Exported:   "exported",
+			unexported: "unexported",
+		}
+		scrubbedObject, _ := Scrub(s, scrubbingFunction([]string{
+			"/unexported",
+		}))
+		if scrubbedObject.(structWithUnexported).unexported == s.unexported || scrubbedObject.(structWithUnexported).unexported != "" {
+			t.Errorf("Unexported field wasn't skipped. scrubbedObject = %v, expectedRestoredObject %v", scrubbedObject, s)
+		}
+		if scrubbedObject.(structWithUnexported).Exported != s.Exported {
+			t.Errorf("Exported field should not be modified. scrubbedObject = %v, expectedRestoredObject %v", scrubbedObject, s)
+		}
+	})
+}
+
 func scrubbingFunction(allowedFieldPaths []string) OnValueFuncHandler {
 	return func(fieldPath string, valueToScrub interface{}) *string {
 		if stringInSlice(fieldPath, allowedFieldPaths) {
