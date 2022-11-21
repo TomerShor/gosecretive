@@ -28,7 +28,8 @@ var DefaultOnValueFuncHandler = func(fieldPath string, valueToScrub interface{})
 }
 
 // Scrub will scrub the given object. if not scrubFuncHandler is given, default to DefaultOnValueFuncHandler.
-// returns the scrubbed object and a map of the scrubbed data
+// returns the scrubbed object and a map of the scrubbed data.
+// if the object contains unexported fields, they will be ignored and won't be in the scrubbed object.
 // e.g.:
 // 	original := map[string]interface{}{
 // 	    "field": "value",
