@@ -28,7 +28,8 @@ var DefaultOnValueFuncHandler = func(fieldPath string, valueToScrub interface{})
 }
 
 // Scrub will scrub the given object. if not scrubFuncHandler is given, default to DefaultOnValueFuncHandler.
-// returns the scrubbed object and a map of the scrubbed data
+// returns the scrubbed object and a map of the scrubbed data.
+// if the object contains unexported fields, they will be ignored and won't be in the scrubbed object.
 // e.g.:
 // 	original := map[string]interface{}{
 // 	    "field": "value",
@@ -147,18 +148,22 @@ func travel(fieldPath string,
 
 	// value is a string. call the callback
 	case reflect.String:
-		newContent := callback(fieldPath, original.Interface())
+		if travelValue.CanSet() {
+			newContent := callback(fieldPath, original.Interface())
 
-		// callback returns a new value to set (override)
-		if newContent != nil && original.String() != *newContent {
-			secrets[*newContent] = original.String()
-			travelValue.SetString(*newContent)
-		} else {
-			travelValue.SetString(original.String())
+			// callback returns a new value to set (override)
+			if newContent != nil && original.String() != *newContent {
+				secrets[*newContent] = original.String()
+				travelValue.SetString(*newContent)
+			} else {
+				travelValue.SetString(original.String())
+			}
 		}
 
 	default:
-		travelValue.Set(original)
+		if travelValue.CanSet() {
+			travelValue.Set(original)
+		}
 	}
 
 }
